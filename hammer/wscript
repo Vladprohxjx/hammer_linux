@@ -1,0 +1,85 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import vpc_parser
+
+top = '.'
+PROJECT_NAME = 'hammer_dll'
+
+
+def options(opt):
+	return
+
+
+def configure(conf):
+	pass
+
+
+def build(bld):
+	game = vpc_parser.parse_vpcs(
+		bld.env,
+		['hammer_dll.vpc'],
+		'..'
+	)
+
+	# vpc_parser also returns bitmap/ico/cur resource entries.
+	# Hammer's C++ target only needs compilable source files here.
+	source = [
+		f for f in game['sources']
+		if f.lower().endswith(('.c', '.cc', '.cpp', '.cxx', '.rc'))
+	]
+
+	includes = [
+		'.',
+		'../common',
+		'../public',
+		'../public/tier0',
+		'../public/tier1',
+		'../public/mathlib',
+		'../public/vgui_controls',
+		'../vgui2/include',
+		'../vgui2/controls',
+		'../common/shaderdll',
+		'../common/iostream',
+		'../game/shared',
+		'../utils/common',
+	]
+
+	includes += game['includes']
+
+	defines = game['defines']
+
+	libs = [
+		'bitmap',
+		'choreoobjects',
+		'dmxloader',
+		'fgdlib',
+		'mathlib',
+		'matsys_controls',
+		'raytrace',
+		'steam_api',
+		'tier0',
+		'tier1',
+		'tier2',
+		'tier3',
+		'vgui_controls',
+	]
+
+	# Hammer itself is a Windows GUI DLL and uses MFC.
+	libs += [
+		'winmm',
+		'rpcrt4',
+	]
+
+	bld.shlib(
+		source=source,
+		target=PROJECT_NAME,
+		name=PROJECT_NAME,
+		features='c cxx',
+		includes=includes,
+		defines=defines,
+		use=libs,
+		install_path=bld.env.LIBDIR,
+		subsystem='WINDOWS',
+		idx=bld.get_taskgen_count()
+	)

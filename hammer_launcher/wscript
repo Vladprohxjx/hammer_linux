@@ -1,0 +1,44 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+top = '.'
+PROJECT_NAME = 'hammer'
+
+
+def options(opt):
+	return
+
+
+def configure(conf):
+	pass
+
+
+def build(bld):
+	includes = [
+		'.',
+		'../public',
+		'../public/tier0',
+		'../public/tier1',
+	]
+
+	libs = [
+		'appframework',
+		'tier0',
+		'tier1',
+		'vstdlib',
+	]
+
+	bld.program(
+		source=[
+			'main.cpp',
+			'hammer_launcher.rc',
+		],
+		target=PROJECT_NAME,
+		name=PROJECT_NAME,
+		features='c cxx',
+		includes=includes,
+		use=libs,
+		install_path=bld.env.PREFIX,
+		subsystem='WINDOWS',
+		idx=bld.get_taskgen_count()
+	)
